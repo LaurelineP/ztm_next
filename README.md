@@ -82,6 +82,8 @@ make sure to either select "app" for "app router" or "page" for "page router"
 |  | **Data fetching methods** <br> how to fetch, cache & revalidate data  |   |
 |  | **Special files** <br> Loading, Error, Page, etc..  |   |
 
+
+
 ### 🔹 Metadata example
 ```ts
 	export const metadata: Metadata = {
@@ -207,6 +209,7 @@ Can run your node code at the same place of your react code
 Ex: fetching with api keys 
 - useful when fetching on component at the same route: only calling the task when needed ( after, it shuts down)  
 Creating the serverless function under   `pages/api/<file>.js`
+
 ### 🔹 NextJS vs CRA
 Why Next is popular: 
 - CRA needs to add a lot of packages and learns them
@@ -218,3 +221,238 @@ CRA for:
 NextJS for:
 - more advanced ( SSR, SSG, or others )
 - performances
+
+
+
+## App Router and Project
+### 🔹 Installation
+- `npx create-next-app@latest`: execute a command to  
+create a next app.  
+It will prompt questions for your project config customizations
+
+### 🔹 Exploring
+- node_modules: packages dependencies
+- tailwind.config
+- middleware.ts - middle man between front + requests - triggered on req.
+
+- next.config.ts : used by next: in build phases and for the server - not  
+included in the frontend
+Not included in the build
+
+**Routing mechanisms**
+- app router - `app` dir
+Each time we create a file in the app router, is by default a server component
+Thinking first about the logic server side then the client side
+
+- page router - `pages` dir
+Each time we create a file under this folder it gets a route 
+
+**In the folder app**
+File or folder with `*` are mandatory named as displayed
+- `app/<folder_route>` the folder creates a route. Ex: `app/page.tsx` 
+- `page.tsx`* is the page for a route
+- `layout.tsx`*: has some html - this is normal as this is the layout
+Shared by multiple pages
+- `api/route.ts`* - 
+
+
+### 🔹 Metadata
+SEO and Metadata - Next is that much known because of SEO.
+NextJS provides Metadata ( `meta`, `link` tags in the HTML `head` element)
+to improve SEO
+Metadata are ways to provides info about the web app
+- tab title
+- web app description
+- etc...
+
+Metadata - 2 ways to handle this with Next 
+By default - it is generally set at `app/layout.ts` 
+- statically 
+- dynamically
+```js
+// https://nextjs.org/docs/app/api-reference/functions/generate-metadata
+import { Metadata } from 'next'
+ 
+// either Static metadata
+export const metadata: Metadata = {
+  title: '...',
+}
+ 
+// or Dynamic metadata
+export async function generateMetadata({ params }) {
+  return {
+    title: '...',
+  }
+}
+```
+
+### 🔹 TailwindCSS
+Next proposes TailwindCSS out of the box
+- [Crash course](https://www.youtube.com/watch?v=coMJ4R8GzEA)
+
+Benefices
+- inline styling using tailwindcss
+- no need to create stylesheet
+- no need to spend time on the class namings
+- flexible customization
+- dark mode class
+- consistency
+- palette color customization
+- mobile first
+
+
+
+### Code as you explore
+- Removed `app/page.tsx`'s inner main content
+- Customizing it:
+	- h1: App name
+- `global.css`:
+	- removed all css but import
+	- added the css from the assignment resource
+	- `@apply` directive - allows to use tailwind defined curstomisation 
+- `tailwindcss.config.ts`
+	- `theme.extend.colors`
+		```js
+			// ...
+			theme: {
+				extend: {
+					colors: {
+						<color-name>: <color-value>
+					}
+				}
+			},
+		```
+	- `backgroundImage`
+	```js
+	//...
+	theme: {
+		extend: {
+			backgroundImage: {
+				<name-of-bg-img>: url(<static-path>)
+			}
+		}
+	},
+	```
+- Next fonts - fonts and optimization
+Generally - On slow wifi - the font download on the page once it is ready and this could take time.
+Issue with that is that the vital metrics need  
+it to make its visual stability analyses   
+and how the quality of the website is
+
+Next will automatically optimize the fonts,  
+as we have the ability to store it from the external resources  and host it on the next server  
+Which leads to zero layout shift because of the
+underlying CSS size adjust they are using
+Next has something for google font.
+Called on next doc "variable font
+```ts
+// Generally on layout.ts
+// import { <fontname> } from 'next/font/google'
+import { Roboto } from "next/font/google";
+import "./globals.css";
+
+const inter = Roboto({
+  weight: ["300", "500", "700"],
+  subsets: ["latin"]
+});
+```
+```css
+/* global.css */
+
+h1 {
+  @apply text-4xl font-bold text-white md:text-5xl lg:text-7xl
+}
+
+```
+
+
+- Using Multiple Fonts
+We can configured special css variables  
+by extending the `tailwind.config.ts`
+```ts
+// ...
+theme: {
+	// ...
+	theme: {
+		extend: {
+			fontFamily: {
+				// <font-name>: <css-variable-rule>
+				roboto: 'var(--font-roboto)'
+				rolato: 'var(--font-lato)'
+			}
+		}
+	},
+}
+```
+
+
+### What are server components
+- Server Component: components fetched and rendered on the server
+	- similar to react components but handled by the server rather than 
+	the client ( can access DB queries for instance )
+- Client components: Fetched and rendered on and by the browser ( DOM, browser API ) - alike components we've always used when doing react.
+
+
+Benefices:
+	- less weight on the bundle - as the server handled the
+	component with data
+
+Example - react client components
+														_________________________
+	_________						   Hydrate	data	|						|
+	|		|							_____________ 	|						|
+	|		|  	fetch db data			|			|	| *Client side bundle*	|
+	|		| <---------------------	| 	Client  |	|						|
+	|	DB	| --------------------->   	|___________|	|	_________________	|
+	|		|	Return JSON data 						|	|				|	|
+	|_______|											|	|	  Card		|	|
+														|	|				|	|
+														|	|_______________|	|
+														| 	Text____________	|
+														|						|
+														|_______________________|
+
+
+
+
+Example - react server components
+_________________________		
+|						|	_________
+|						|	|		|	on req., fetch, render		_____________
+| *Server Components*	|	|		|   components					|			|
+|						|	|		| <------------------------		| 	Client  |
+|	_________________	|	|	DB	| ------------------------>   	|___________|
+|	|				|	|	|		|	Return stream
+|	|	  Card		|	|	|_______|
+|	|				|	|		
+|	|_______________|	|
+| 	Text____________	|
+|						|
+|_______________________|
+
+### Why do we need server components?
+Typical app: ( which is hydration here)
+	- a server - a client consuming the browser
+	- the browser fetches and rerender in page
+	- ask server to get data and render to the page 
+	---> why not getting data and rendering from server?
+	-----> this is why server rendering was done.
+			- implies to review the architecture
+			- implies some data will never be re-rendered
+			--> some React API now are incompatible with
+				render component because of the previous points
+				( ex: cannot use useState, useCallback in components
+				parent rendering a server side component, forms with
+				state - Server side component cannot be re-rendered)
+				Effects can only rendered on the client has rendered
+
+
+### When to User Server vs. Client Components?
+Server components
+	- benefits:
+		- rendered by the server = not included in client bundle = < weight
+		- automatic code splitting
+	- cons: 
+		- parent components should not depends on state changes
+		- cannot be re-rendered
+	--> See https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns
