@@ -1,0 +1,11 @@
+{
+  "name": "ztm_next",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "coffee-places:dev": "pnpm prefix --coffee-places run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
