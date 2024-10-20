@@ -8,7 +8,7 @@ providing a folder structure and embed tools ready to use
 
 ## Resources:
 - [Official NextJS Documentation](https://nextjs.org/)
-- [Next handbook companion](https://innate-noodle-e82.notion.site/Next-js-Course-Handbook-d1ed7f83a8044ada8c933a11f7b70dc3)
+- [Teacher's Next handbook companion](https://innate-noodle-e82.notion.site/Next-js-Course-Handbook-d1ed7f83a8044ada8c933a11f7b70dc3)
 
 
 <br>
@@ -255,21 +255,6 @@ File or folder with `*` are mandatory named as displayed
 Shared by multiple pages
 - `api/route.ts`* - 
 
-
-### 🔹 Metadata
-SEO and Metadata - Next is that much known because of SEO.
-NextJS provides Metadata ( `meta`, `link` tags in the HTML `head` element)
-to improve SEO
-Metadata are ways to provides info about the web app
-- tab title
-- web app description
-- etc...
-
-Metadata - 2 ways to handle this with Next 
-By default - it is generally set at `app/layout.ts` 
-- statically 
-- dynamically
-```js
 // https://nextjs.org/docs/app/api-reference/functions/generate-metadata
 import { Metadata } from 'next'
  
@@ -386,7 +371,142 @@ theme: {
 ```
 
 
-### What are server components
+### 🔹 Coffee Connoisseurs aka Coffee Placed
+
+### 🔹 Global CSS and Tailwind Config
+- `global.css` - should copy the course repo same file's content into the file
+	- tailwind layer base `@tailwind base` x `@layer base`:
+	Injects any based style into tailwind base style - referring to styling,
+	we may need to update `tailwind.config.ts`
+	```css
+	h1 {
+		/* applies style for web (lg) and mobile (text-4xl) and medium screens (md:text-5xl) */
+		@apply text-4xl font-bold text-white md:text-5xl lg:text-7xl;
+	}
+	```
+	- tailwind layer base `@tailwind components`
+	- tailwind layer base `@tailwind utilities`
+
+### 🔹 Fonts in NextJs
+- Important to optimize loaded fonts as in general:
+	- fonts are downloaded by the client
+	but on low internet -> it could change
+	how the web app is displayed
+		- uses default font
+		- then download the fonts one by one ( weight on client side added)
+		- then it is applied to the page ( being a Google CLS pb)
+	- Google CLS measures larger burst of layout shift scored for 
+	unexpected layout shift that occurs during the entire lifespan
+	of a page ( anytime an element changes its position 
+	from rendered frame )
+	> important for measuring stability of a website / web app
+	and the quality of the app
+- Using `next/fonts`: 
+	- no need to download on app ( = less weight )
+	- automatically optimize the fonts ( including custom ones )
+	& remove external network req. to improve
+	privacy and performance
+	- Leading to avoid layer shift
+
+**Google Fonts**
+- import fonts from google
+- specify font behaviour
+- use variables ( behave as x same font family with a special style )
+	- refers to regular font has variable files for bold / thin / italic
+	- help applies different file variation without downloading all fonts
+	```tsx
+	// app.layout.tsx
+	// import { <FONT> } from 'next/fonts/google'
+	import { Roboto } from 'next/fonts/google';
+
+	// associate to a variable to use + defining it
+	const roboto = Roboto({
+		weight: "300",
+		subsets: ["latin"],
+		variable: '--roboto'
+	});
+
+	// rendered body example - using font
+	// ...
+	return (
+		<html lang='en'>
+			<body className={roboto.className}> { children }</body>
+		</html>
+	)
+	```
+- multiple fonts:
+Application / website often have different font usage - with next/fonts we need to specify a variable property to the constant
+to identify the font amongst the other
+	```tsx
+	const roboto = Roboto({
+		weight: "300",
+		subsets: ["latin"],
+		variable: '--roboto'
+	});
+	const comfortaa = Comfortaa( {
+		weight: "300",
+		subsets: ["latin"],
+		variable: '--comfortaa'
+	})
+
+	const fontClassNames = `${comfortaa.variable} ${roboto.variable}`;
+	return (
+		<html lang="en" className = {fontClassNames}>
+			<body>{children}</body>
+		</html>
+	);
+
+	```
+
+	- applying default font - in `tailwind.config.ts`
+	```ts
+	theme.extend.fontFamily: {
+		comfortaa: ['var(--comfortaa)']
+	}
+	```
+- Using Local Fonts / original font to import in public folder:
+If needed: A bit of cleaning is made to get back to have one font used ( comfortaa )
+	- removed tailwind.config fontFamily
+	- removed app/layout.tsx extra imports and variables property
+	- removed global h1 font-default
+
+	```ts
+		import { localFont } from 'next/fonts/local'
+
+		// one font
+		const myFont = localFont({
+			src: '<local-source>',
+			display: 'swap'
+		})
+
+		// multiple local fonts
+		const myFont = localFont([{
+			src: '<local-source>',
+			display: 'swap'
+		}])
+
+		// ...
+		<p className = {myFont.className}>
+	```
+
+### 🔹 Metadata
+SEO and Metadata - Next is that much known because of SEO.
+NextJS provides Metadata ( `meta`, `link` tags in the HTML `head` element)
+to improve SEO
+Metadata are ways to provides info about the web app
+- tab title
+- web app description
+- etc...
+
+Metadata - 2 ways to handle this with Next 
+By default - it is generally set at `app/layout.ts` 
+- statically 
+- dynamically
+
+
+
+## App Router / Server Components and Clients Components
+### 🔹 What are server components
 - Server Component: components fetched and rendered on the server
 	- similar to react components but handled by the server rather than 
 	the client ( can access DB queries for instance )
@@ -430,7 +550,7 @@ _________________________
 |						|
 |_______________________|
 
-### Why do we need server components?
+### 🔹 Why do we need server components?
 Typical app: ( which is hydration here)
 	- a server - a client consuming the browser
 	- the browser fetches and rerender in page
@@ -447,7 +567,7 @@ Typical app: ( which is hydration here)
 				Effects can only rendered on the client has rendered
 
 
-### When to User Server vs. Client Components?
+### 🔹 When to User Server vs. Client Components?
 Server components
 	- benefits:
 		- rendered by the server = not included in client bundle = < weight
@@ -456,3 +576,36 @@ Server components
 		- parent components should not depends on state changes
 		- cannot be re-rendered
 	--> See https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns
+
+
+### Walkthrough of the Blog App Archi
+```txt
+These are the possible page view - the list of articles / the article itself
+- Date fns npm module to format date ( server ) > server component
+- Click in list > blog/id
+	______________/blog_______________  		______________/blog/id_______________
+	|	__CARDLIST_________________	  |			|									|
+	|	|	__CARD_____________	  |	  |			|			Blog post title			|
+	|	|	| Blog post title  |  |   | 		|									|
+	|	|	| formatted date   |  |	  | 		|			Desc./ abstract			|
+	|	|	|__________________|  |   | 		|									|
+	|	|	 				      |   | 		|									|
+		|	 				      |	  |			|									|
+	|	|	__CARD_____________	  |	  |			|									|
+	|	|	| Blog post title  |  |   | 		|									|
+	|	|	| formatted date   |  |	  | 		|									|
+	|	|	|__________________|  |   | 		|									|
+	|	|	 				      |   |			|									|
+	|	|_________________________|   |			|___________________________________|
+	|_________________________________|			|___________________________________|
+```
+
+## Exercise 1: transform a client component to a server component
+Context: this repo to clone - https://stackblitz.com/edit/stackblitz-starters-ya4sy7?file=components%2Fcard.tsx
+Date is using a package installed - a quite heavy one - that could  
+be computed from the server side.
+Objectives: 
+- transform the component using the date in a server component
+- apply best practices to avoid the anti-pattern of having a
+component server instantiated in a client component
+https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#unsupported-pattern-importing-server-components-into-client-components
