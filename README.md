@@ -609,3 +609,201 @@ Objectives:
 - apply best practices to avoid the anti-pattern of having a
 component server instantiated in a client component
 https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#unsupported-pattern-importing-server-components-into-client-components
+
+Currently:
+- rendered by the client because, even though the file ( by the absence of the file instruction "use client"), this is considered as a client component == Anti pattern
+Viewable for unchanged code, ran as dev, in browser dev tools source - the component date.tsx 
+is in the app loaded on the browser ( see folder _N_E/ = folder related to sourcemap ( compoilation mapped as JS code - allowing developers to debug))
+Reminder: 
+- Any time a root compomemt is marked as client component.
+ all the subtree ( child components ) will be considered as client component.
+ Even though it is supposed to be a server component
+
+ Objective - in the component client having the server component:
+ - we could move it outside in order to pass it as children to a component
+ - to do so we also need to adjust the parent that will receive the component
+ as a child node 
+
+
+
+## Exercise 2: transform a client component to a server component
+Context: this repo to use - https://stackblitz.com/edit/stackblitz-starters-ya4sy7?file=components%2Fcard.tsx
+Personal solution:
+	Note:
+		- tailwind.config.ts should have a `darkMode`
+	- First attempts ( failed )
+		- as shown in the Next documentation: I've created 
+
+## Banner component
+The banner will have a button ( hence a event listener click )
+--> will be a client component
+
+# Routing with next / Next App Router
+## Routing fundamentals
+Next routes, as other metadata framework, are relying on the file system organization
+Routes are made by creating either
+- [ pages router - v < Next 13 ]: a `./pages` folder (root level )> the filenames would be considers as endpoints
+- [ app router - v > Next 13 ]or by creating a folder under app 
+	- which foldername would be the endpoint
+	- must contain generic filename `page.tsx` to be consider as a page
+
+Based on the organizations on root page,
+Next will deduct page by precedence on the approach you take
+( Has been tested ) not both
+
+### Pros & Cons of these changes
+- ( pros ) app routers ( built on top of server components ) allows:
+	- gives more options:
+		- sharing the layout
+		- for nested routing
+		- loading state
+		- error handlings
+		---> optimization embedded with that approach
+- ( cons ) pages router:
+	- current configuration and file pages moved to `./pages`
+		- loads `./pages/index.tsx` but without background ( static image )
+		- loads `./app/shops` correctly ( with all the styling and bg )
+		- loads `./pages/plop.tsx` but without background ( static image )
+		- TO NOTE: under that configuration, pages are expected to be 
+		exported as `default`
+
+## Routing terminology
+- a tree: anything inside the app router 
+- subtree: any tree inside a tree
+- root: any folder being the parent of a tree
+- leaf/leaves: a parent folder children ( folders nested within closest tree )
+
+## Dynamic routing `[slug]`
+In Next, relying of file system, dynamic routing are build 
+by nested folders named between square brackets
+- we could provide the same layout for those pages
+- but we need to have dynamic data according to each item
+Note: a slug is a unique routing segment ( usually represent an item )
+Example:
+```text
+Observing the patterns
+--> /<a-route-segment-name>/<slug>
+	app/
+	|
+	|___ page.tsx
+	|___ <a-route-segment-name>
+		|___ page.tsx
+		|___ [ slug ]
+			|___ page.tsx
+
+Use case with folder naming 
+--> /shops/1
+	app/
+	|
+	|___ page.tsx
+	|___ shops
+		|___ page.tsx
+		|___ [ 1 ]
+			|___ page.tsx
+```
+### Getting/Setting Dynamic route `[slug]`
+- in the `<route-name>/[slug]/page.tsx` getting params
+	```tsx
+		export default function Page({ params }: { params : { slug: string }}){
+			return <h1>Item: { params.slug }
+		}
+	```
+
+## Catch All Routes `[...slug]`
+Catches multiple part segments in URL.
+It works like dynamic routing ( seen earlier ) but
+this folder name has a spread operator
+### Setting catch all routes
+- `[...slug] folder: create a folder with a 
+spread slug name between squared brackets
+
+Use case: 
+	- when after an item there are other route segments.
+	- it avoids creating multiple nested folders to create a route
+	- shares same template
+
+## Differences between Dynamic `[slug]` and Catch All `[...slug]` routes
+Dynamic Route
+- when you use **one** URL segment
+
+Catch All Route
+- when you use **multiple** URL segment
+
+## Routing Exercise
+Resource: [Routing Exercise on StackBlitz](https://stackblitz.com/edit/routing-gods?file=README.md) ( Instructions in Readme)
+Implementation(mine): https://stackblitz.com/edit/routing-gods-6lcnrx?file=README.md
+
+Correction: https://stackblitz.com/edit/stackblitz-starters-h2uabj?file=README.md
+
+
+## Link Component
+
+Allows prefetching by default ( can be set to false )
+Use Link component from next when navigating to app
+
+- Link a non dynamic page
+- Link a dynamic page
+
+# App Router - SEO - Hydration - Different Rendering
+## SEO ( Search Engine Optimization )
+
+
+			_________________________________
+			|								|
+			|	When we google something	|
+			|_______________________________|
+			/			   |				\
+___________/		  _____|______		 	 \___________
+| Crawling |		  | Indexing |		  	  | Ranking	 |
+|__________|		  |__________|		  	  |__________|
+Finding what 		Once discovered,	  	Serves highly ranked page
+pages exists 		Finds page contend	  	based on users location,
+& discover pages	Google tried to 	  	lang. & device
+					understand the page
+
+					___________________
+					|	Google DB 	  |
+					|_________________|
+
+
+
+A bot will:
+- crawl about the research
+- then try to index the page; try to understand the page
+through the head of the DOM, checking the meta referenced
+in order to index the page"
+  - Meta: description and web title
+  - semantic: right tag for right use
+  - image should have alt description
+- then ranking: Once search, the best quality and 
+DOM head:
+
+User behavior with SEO
+- Scoring page: checking navigation : 
+	- clicking through rate,
+	- bounce rate: time to click on back link,
+	- dwell time: user spent time
+
+Bot will then rank the pages based on location, device, language.
+SEO with Next is easy to handle
+
+## Client Rendering vs. Server Rendering
+
+- [Disney App (Create React App)](https://codesandbox.io/p/devbox/cra-disney-movies-2d6y64?file=%2Fsrc%2FApp.js)
+- [A Next.js App Blog](https://kulkarniankita.com/blog)
+- [Disney App (Next.js App)](https://codesandbox.io/p/devbox/next-js-disney-movies-rztc3r)
+
+Observing how a web page is rendered:
+- go browser dev tool 
+- then check the `performance` tab
+- press the record buttons ( circle left side of pannel ) ( which will re-render)
+This tells your browser to check the rendering metrics for  
+the website loading
+
+Observation ( visual timeline )
+- fist preview blank page
+- then pictures loaded one by one 
+--> It takes about a second to load the JS ( see bundle.js ending load)
+
+In sources code > index file : we can run a command "cmd + P" to run a command : 
+`Run > disable` which will disable the js 
