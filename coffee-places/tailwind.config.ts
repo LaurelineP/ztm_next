@@ -26,7 +26,21 @@ const config: Config = {
 				"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
 				"gradient-conic":
 					"conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+				map: "url('/static/map.png')"
 			},
+			borderRadius: {
+				"neg-br-10": "-10px"
+			},
+			 keyframes: {
+				"slightly-rotate": {
+					// '50%': { transform: 'rotate(3deg)' },
+					'to': { transform: 'rotate(-15deg)' },
+				}
+			},
+			animation: {
+				"slightly-rotate": 'slightly-rotate 4s ease-in-out infinite',
+			}
+			
 		},
 	},
 	plugins: [],
